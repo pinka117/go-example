@@ -6,7 +6,10 @@ require (
 	github.com/andybalholm/brotli v1.0.1 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
+	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/gofiber/fiber/v2 v2.3.2
+	github.com/gofiber/session v1.2.5
+	github.com/gofiber/storage/redis v0.0.0-20201214031209-9829073dd76f
 	github.com/kamva/mgm/v3 v3.1.0
 	github.com/klauspost/compress v1.11.4 // indirect
 	github.com/valyala/fasthttp v1.19.0 // indirect

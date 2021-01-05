@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"example/routes"
@@ -9,5 +9,8 @@ import (
 func SetupRoutes(app *fiber.App) {
 
 	app.Post("/signup", routes.PostSignup)
+
+	app.Post("/login", routes.PostLogin)
+
 
 }
