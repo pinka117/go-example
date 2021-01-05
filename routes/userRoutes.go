@@ -11,10 +11,9 @@ import (
 )
 
 var validate *validator.Validate
-var userService services.UserService
+var userService services.IUserService
 
 func InitUserRoutes() {
-
 	userService = services.UserService{
 		UserRepository: new(repositories.UserRepository),
 	}

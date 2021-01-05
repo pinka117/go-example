@@ -11,11 +11,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type IUserService interface {
+	SaveUser(mail, name, password, surname string) (*models.User, error)
+	CheckUserPassword(mail, password string) error
+}
+
 type UserService struct {
 	UserRepository *repositories.UserRepository
 }
 
-func (p *UserService) SaveUser(mail, name, password, surname string) (*models.User, error) {
+func (p UserService) SaveUser(mail, name, password, surname string) (*models.User, error) {
 	userDuplicate := p.UserRepository.SearchByMail(mail)
 	if userDuplicate.Mail != "" {
 		return nil, errors.New("Duplicate User")
@@ -39,7 +44,7 @@ func (p *UserService) SaveUser(mail, name, password, surname string) (*models.Us
 	return userSaved, nil
 }
 
-func (p *UserService) CheckUserPassword(mail, password string) error {
+func (p UserService) CheckUserPassword(mail, password string) error {
 	userSaved := p.UserRepository.SearchByMail(mail)
 
 	if userSaved.Password == "" {
