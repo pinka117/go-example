@@ -46,10 +46,8 @@ func PostLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 
-	err := services.CheckUserPassword(userRequest)
-
-	if err != nil {
-		return c.SendStatus(fiber.StatusBadRequest)
+	if err := services.CheckUserPassword(userRequest); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 
 	sess, err := utils.Store.Get(c)
