@@ -10,6 +10,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.3.2
 	github.com/gofiber/session v1.2.5
 	github.com/gofiber/storage/redis v0.0.0-20201214031209-9829073dd76f
+	github.com/golang/mock v1.4.4
 	github.com/kamva/mgm/v3 v3.1.0
 	github.com/klauspost/compress v1.11.4 // indirect
 	github.com/valyala/fasthttp v1.19.0 // indirect

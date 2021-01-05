@@ -4,12 +4,21 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 
+	"example/repositories"
 	"example/request"
 	"example/services"
 	"example/utils"
 )
 
 var validate *validator.Validate
+var userService services.UserService
+
+func InitUserRoutes() {
+
+	userService = services.UserService{
+		UserRepository: new(repositories.UserRepository),
+	}
+}
 
 func PostSignup(c *fiber.Ctx) error {
 	//Prendo il body in JSON e lo metto dentro un oggetto
@@ -25,7 +34,7 @@ func PostSignup(c *fiber.Ctx) error {
 	}
 
 	//Salvo l'utente
-	userSaved, err := services.SaveUser(userRequest)
+	userSaved, err := userService.SaveUser(userRequest.Mail, userRequest.Name, userRequest.Password, userRequest.Surname)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
@@ -46,7 +55,7 @@ func PostLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 
-	if err := services.CheckUserPassword(userRequest); err != nil {
+	if err := userService.CheckUserPassword(userRequest.Mail, userRequest.Password); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 
