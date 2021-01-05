@@ -17,7 +17,7 @@ type IUserService interface {
 }
 
 type UserService struct {
-	UserRepository *repositories.UserRepository
+	UserRepository repositories.IUserRepository
 }
 
 func (p UserService) SaveUser(mail, name, password, surname string) (*models.User, error) {

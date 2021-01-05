@@ -1,16 +1,27 @@
 package services
 
 import (
-	"testing"
-	"github.com/golang/mock/gomock"
-
+	"example/mocks"
 	"example/models"
+	"example/utils"
+	"github.com/golang/mock/gomock"
+	"testing"
 )
 
 func TestSave(t *testing.T) {
-	t.Parallel()
-	ctrl := gomock.NewController(t)
-	
-	m := NewMockUserRepository(ctrl)
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
 
+	mock := mocks.NewMockIUserRepository(mockCtrl)
+
+	hashedPassword, _ := utils.HashPassword("password")
+	mock.
+		EXPECT().
+		SearchByMail("mail").
+		Return(models.NewUser("name", "surname", hashedPassword, "mail"))
+
+	SUT := UserService{mock}
+	if err := SUT.CheckUserPassword("mail", "password"); err != nil {
+		t.Error("Check Hash Password Failed")
+	}
 }
