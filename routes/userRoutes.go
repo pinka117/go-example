@@ -1,23 +1,19 @@
 package routes
 
 import (
-	"log"
-
-	"example/models"
-	"example/utils"
-
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
-	"github.com/kamva/mgm/v3"
-	"go.mongodb.org/mongo-driver/bson"
-	"golang.org/x/crypto/bcrypt"
+
+	"example/request"
+	"example/services"
+	"example/utils"
 )
 
 var validate *validator.Validate
 
 func PostSignup(c *fiber.Ctx) error {
 	//Prendo il body in JSON e lo metto dentro un oggetto
-	userRequest := new(UserSignupRequest)
+	userRequest := new(request.UserSignupRequest)
 	if err := c.BodyParser(userRequest); err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
@@ -28,33 +24,18 @@ func PostSignup(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 
-	//Faccio l'hash della password dell'utente
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), bcrypt.DefaultCost)
+	//Salvo l'utente
+	userSaved, err := services.SaveUser(userRequest)
 	if err != nil {
-		log.Print(err)
-		return c.SendStatus(fiber.StatusBadRequest)
+		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
-
-	//Creo un nuovo documento per l'utente
-	user := models.NewUser(userRequest.Name, userRequest.Surname, string(hashedPassword), userRequest.Mail)
-
-	// Salvo a db l'utente
-	if err := mgm.Coll(user).Create(user); err != nil {
-		log.Print(err)
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
-
-	//Faccio una query per cercare l'utente appena salvato
-	userSaved := &models.User{}
-	coll := mgm.Coll(userSaved)
-	coll.First(bson.M{"mail": userRequest.Mail}, userSaved)
 
 	//Faccio una risposta con l'utente salvato
 	return c.JSON(userSaved)
 }
 
 func PostLogin(c *fiber.Ctx) error {
-	userRequest := new(UserLoginRequest)
+	userRequest := new(request.UserLoginRequest)
 	if err := c.BodyParser(userRequest); err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
@@ -65,25 +46,19 @@ func PostLogin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
 	}
 
-	userSaved := &models.User{}
-	coll := mgm.Coll(userSaved)
+	err := services.CheckUserPassword(userRequest)
 
-	if err := coll.First(bson.M{"mail": userRequest.Mail}, userSaved); err != nil && userSaved.Password != "" {
+	if err != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-	if checkPasswordHash(userRequest.Password, userSaved.Password) {
-		sess, _ := utils.Store.Get(c)
 
-		sess.Set("name", []byte(userRequest.Mail))
-		defer sess.Save()
-		return c.SendStatus(fiber.StatusOK)
+	sess, err := utils.Store.Get(c)
+	if err != nil {
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
+	sess.Set("name", []byte(userRequest.Mail))
+	defer sess.Save()
 
-	return c.SendStatus(fiber.StatusBadRequest)
+	return c.SendStatus(fiber.StatusOK)
 
-}
-
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }

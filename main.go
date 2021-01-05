@@ -8,7 +8,6 @@ import (
 	"example/utils"
 )
 
-
 func main() {
 	app := fiber.New()
 
@@ -16,9 +15,7 @@ func main() {
 
 	utils.InitDb()
 
-
 	SetupRoutes(app)
-
 
 	log.Fatal(app.Listen(":3000"))
 }

@@ -1,4 +1,4 @@
-package routes
+package request
 
 type UserLoginRequest struct {
 	Mail     string `validate:"required,email"`

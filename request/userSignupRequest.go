@@ -1,4 +1,4 @@
-package routes
+package request
 
 type UserSignupRequest struct {
 	Name     string `validate:"required"`
