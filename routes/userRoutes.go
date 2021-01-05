@@ -19,6 +19,14 @@ func InitUserRoutes() {
 	}
 }
 
+// ShowAccount godoc
+// @Summary Save an account
+// @ID get-string-by-int
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Account ID"
+// @Header 200 {string} Token "qwerty"
+// @Router /signup [post]
 func PostSignup(c *fiber.Ctx) error {
 	//Prendo il body in JSON e lo metto dentro un oggetto
 	userRequest := new(request.UserSignupRequest)
